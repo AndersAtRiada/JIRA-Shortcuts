@@ -11,7 +11,10 @@ String restUser = "user"
 String restPw = "password"
 String jiraHome = "/var/atlassian/application-data/jira/"
 Map<String, String>sourceDestinationFile = [
-        "src/customRiadaLibraries/jiraShortcuts/JiraShortcuts.groovy": "customRiadaLibraries/jiraShortcuts/JiraShortcuts.groovy",
+        //"src/customRiadaLibraries/jiraShortcuts/JiraShortcuts.groovy": "customRiadaLibraries/jiraShortcuts/JiraShortcuts.groovy",
+        "Examples/customRiadaLibraries/jiraShortcuts/examples/configInventory/classes/Configuration.groovy":"customRiadaLibraries/jiraShortcuts/examples/configInventory/classes/Configuration.groovy",
+        "Examples/customRiadaLibraries/jiraShortcuts/examples/configInventory/classes/FieldConfig.groovy":"customRiadaLibraries/jiraShortcuts/examples/configInventory/classes/FieldConfig.groovy",
+        "Examples/customRiadaLibraries/jiraShortcuts/examples/configInventory/classes/FieldContextConfig.groovy":"customRiadaLibraries/jiraShortcuts/examples/configInventory/classes/FieldContextConfig.groovy",
 ]
 
 sourceDestinationFile.each {sourceFile, destinationFile->
@@ -49,7 +52,7 @@ void uploadFiles(String hostURI, String restUser, String restPw, String sourceFi
     out.close();
 
 
-    println("IM upload HTTP response code:" + uploadConnection.responseCode)
+    println("Upload HTTP response code:" + uploadConnection.responseCode)
 
 
 

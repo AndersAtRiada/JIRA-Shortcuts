@@ -320,4 +320,79 @@ class JiraShortcuts {
     }
 
 
+
+    String toCustomFieldConfigString(CustomField field) {
+
+        String allFieldIssuesJql = "cf[${field.idAsLong}] is not empty"
+        ArrayList<Issue>allFieldIssues = jql(allFieldIssuesJql)
+
+        String fieldConfigString = field.name + " (${field.id})\n" +
+                "   Field type:${field.customFieldType.name}\n" +
+                "   In use in issues:${allFieldIssues.size()}\n" +
+                "       JQL Used:$allFieldIssuesJql\n" +
+                "   Contexts:\n"
+
+        field.configurationSchemes.each {context->
+
+            String contextJql = "cf[${field.idAsLong}] is not empty"
+
+
+            if (context.allProjects) {
+                //Ignoring projects from other contexts
+                ArrayList<String>projectKeysFromOtherContexts = field.configurationSchemes.collect {it.associatedProjectObjects.collect {it.key}}.flatten()
+                if (!projectKeysFromOtherContexts.isEmpty()){
+                    contextJql += " and project not in (${projectKeysFromOtherContexts.join(",")})"
+                }
+
+            }else {
+                contextJql += " and project in (${context.associatedProjectObjects.collect {"\"${it.key}\""}.join(",")})"
+                //contextJql += context.associatedProjectObjects.isEmpty() ? "" : " and project in (${context.associatedProjectObjects.collect {"\"${it.key}\""}.join(",")})"
+            }
+
+            if (context.allIssueTypes) {
+                //Ignoring issuetypes from other contexts
+                ArrayList<String>issueTypesFromOtherContexts = field.configurationSchemes.collect {it.associatedIssueTypes.collect {it ? "\"${it?.name}\"" : null}}.flatten().findAll {it != null}
+                log.debug("issueTypesFromOtherContexts:" + issueTypesFromOtherContexts)
+                log.debug("issueTypesFromOtherContexts:" + issueTypesFromOtherContexts.size())
+                if (!issueTypesFromOtherContexts.isEmpty()) {
+                    contextJql += " and issuetype not in (${issueTypesFromOtherContexts.join(",")})"
+                }
+            }else {
+                //contextJql += context.associatedIssueTypes.findAll{it != null}.isEmpty() ? "" : " and issuetype in (" + context.associatedIssueTypes.collect {"\"${it.name}\""}.join(",") + ")"
+                contextJql += " and issuetype in (" + context.associatedIssueTypes.collect {"\"${it.name}\""}.join(",") + ")"
+
+            }
+
+            ArrayList<Issue>allContextIssues = jql(contextJql)
+
+            fieldConfigString += "" +
+                    "       Name:${context.name}\n" +
+                    "           Description:${context.description}\n" +
+                    "           Global:${context.global}\n" +
+                    "           All Projects:${context.allProjects}\n" +
+                    "           Projects:${context.associatedProjectObjects.collect {it?.key}.join(",") ?: "null"}\n" +
+                    "           All Issuetypes:${context.allIssueTypes}\n" +
+                    "           Issuetypes:${context.associatedIssueTypes.collect {it?.name}.join(",")}\n" +
+                    "           Used in issues:${allContextIssues.size()}\n"+
+                    "               JQL used:$contextJql\n"
+
+
+
+
+
+        }
+
+
+        /*
+        field.configurationSchemes.each {fieldConfigSchema ->
+
+            fieldConfigSchema.
+        }
+
+         */
+
+        return fieldConfigString
+    }
+
+
 }
